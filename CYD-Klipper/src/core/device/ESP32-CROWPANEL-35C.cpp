@@ -24,39 +24,29 @@ static lv_color_t buf[CYD_SCREEN_HEIGHT_PX * CYD_SCREEN_WIDTH_PX / 10];
 class LGFX : public lgfx::LGFX_Device
 {
     lgfx::Panel_ILI9488 _panel_instance;
-    lgfx::Bus_Parallel16 _bus_instance;
+    lgfx::Bus_SPI _bus_instance;
     lgfx::Touch_FT5x06 _touch_instance;
 
 public:
     LGFX()
     {
         auto bus_cfg = _bus_instance.config();
-        bus_cfg.port = 0;
-        bus_cfg.freq_write = 80000000;
-        bus_cfg.pin_wr = 18;
-        bus_cfg.pin_rd = 48;
-        bus_cfg.pin_rs = 45;
-        bus_cfg.pin_d0 = 47;
-        bus_cfg.pin_d1 = 21;
-        bus_cfg.pin_d2 = 14;
-        bus_cfg.pin_d3 = 13;
-        bus_cfg.pin_d4 = 12;
-        bus_cfg.pin_d5 = 11;
-        bus_cfg.pin_d6 = 10;
-        bus_cfg.pin_d7 = 9;
-        bus_cfg.pin_d8 = 3;
-        bus_cfg.pin_d9 = 8;
-        bus_cfg.pin_d10 = 16;
-        bus_cfg.pin_d11 = 15;
-        bus_cfg.pin_d12 = 7;
-        bus_cfg.pin_d13 = 6;
-        bus_cfg.pin_d14 = 5;
-        bus_cfg.pin_d15 = 4;
+        bus_cfg.spi_host = SPI3_HOST;
+        bus_cfg.spi_mode = 0;
+        bus_cfg.freq_write = 60000000;
+        bus_cfg.freq_read = 16000000;
+        bus_cfg.spi_3wire = false;
+        bus_cfg.use_lock = true;
+        bus_cfg.dma_channel = 1;
+        bus_cfg.pin_sclk = 12;
+        bus_cfg.pin_mosi = 13;
+        bus_cfg.pin_miso = 14;
+        bus_cfg.pin_dc = 42;
         _bus_instance.config(bus_cfg);
         _panel_instance.setBus(&_bus_instance);
 
         auto panel_cfg = _panel_instance.config();
-        panel_cfg.pin_cs = -1;
+        panel_cfg.pin_cs = 3;
         panel_cfg.pin_rst = -1;
         panel_cfg.pin_busy = -1;
         panel_cfg.memory_width = 320;
@@ -71,7 +61,7 @@ public:
         panel_cfg.readable = true;
         panel_cfg.invert = global_config.printer_config[global_config.printer_index].invert_colors ? true : false;
         panel_cfg.rgb_order = false;
-        panel_cfg.dlen_16bit = true;
+        panel_cfg.dlen_16bit = false;
         panel_cfg.bus_shared = true;
 
         _panel_instance.config(panel_cfg);
@@ -87,8 +77,8 @@ public:
 
         touch_cfg.i2c_port = 1;
         touch_cfg.i2c_addr = 0x38;
-        touch_cfg.pin_sda = 38;
-        touch_cfg.pin_scl = 39;
+        touch_cfg.pin_sda = 2;
+        touch_cfg.pin_scl = 1;
         touch_cfg.freq = 400000;
 
         _touch_instance.config(touch_cfg);
